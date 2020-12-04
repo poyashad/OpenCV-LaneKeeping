@@ -1,0 +1,3 @@
+/Users/pojashad/Desktop/dev/opencvtest/build/CMakeFiles/rebuild_cache.dir
+/Users/pojashad/Desktop/dev/opencvtest/build/CMakeFiles/edit_cache.dir
+/Users/pojashad/Desktop/dev/opencvtest/build/CMakeFiles/opencvtest.dir
