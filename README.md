@@ -14,3 +14,4 @@ My first attempt on Lane Keeping with OpenCV in C++. Wish me good luck!
 
 
 ## Screenshots
+![alt text](./screenshots/screenshot1.png)
