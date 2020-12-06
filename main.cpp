@@ -17,18 +17,6 @@ Mat convertToBGR(Mat processedFrame) {
     cvtColor(processedFrame, frameInBGR , COLOR_GRAY2BGR);
     return frameInBGR;
 };
-Mat houghlinesP(Mat processedFrame){
-    Mat processedFrameWithLines;
-    vector<Vec4i> lines;
-    HoughLinesP(processedFrame, lines, 1, CV_PI/180, 50, 10, 0);
-    for( size_t i = 0; i < lines.size(); i++ )
-    {
-        Vec4i l = lines[i];
-        line( processedFrame, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(255,255,255), 1, LINE_AA);
-    }
-    processedFrameWithLines = processedFrame;
-    return processedFrameWithLines;
-}
 
 Mat processFrame(Mat frame){
     Mat grayscale, gaussianBlur, imageCanny, processedFrame;
@@ -71,12 +59,9 @@ int main(int argc, char **argv) {
         ROI = roi(src, rect);
         // Process ROI
        processedFrame = processFrame(ROI);
-        // Gör linjer utav processerad ROI
-       // processedFrameWithLines = houghlinesP(processedFrame);
         // Convertera tillbaka processerad ROI med linjer till BGR för kunna lägga till i src frame:n
         frameBGR = convertToBGR(processedFrame);
         // Merge src filen och den processerade ROI
-
         frameBGR.copyTo(src(rect));
         imshow("Processed", src);
         if (waitKey(30) == 27) {
