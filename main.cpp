@@ -99,6 +99,12 @@ int main(int argc, char **argv) {
     Mat org; //Original image, modified only with result
     Mat img; //Working image
 
+
+    int frameCounter = 0;
+    int tick = 0;
+    int fps;
+    std::time_t timeBegin = std::time(0);
+
     while (1) {
 
         //Read a frame
@@ -184,14 +190,27 @@ int main(int argc, char **argv) {
         Mat overlay = Mat::zeros(org.size(), org.type());
         fillPoly(overlay, arr, Scalar(0, 255, 100));
         addWeighted(org, 1, overlay, 0.5, 0, org); //Overlay it
+        frameCounter++;
 
+        std::time_t timeNow = std::time(0) - timeBegin;
+
+        if (timeNow - tick >= 1)
+        {
+            tick++;
+            fps = frameCounter;
+            frameCounter = 0;
+        }
+
+        cv::putText(org, cv::format("Average FPS=%d", fps ), cv::Point(1000, 40), cv::FONT_HERSHEY_COMPLEX, 0.8, cv::Scalar(0,0,255));
         //Show results
         imshow("Preprocess", out);
         imshow("src", org);
+
         if (waitKey(30) == 27) {
             cout << "esc key is pressed by user" << endl;
             break;
         }
+
     }
     cap.release();
     return 0;
