@@ -106,20 +106,27 @@ int main(int argc, char **argv) {
     std::time_t timeBegin = std::time(0);
 
     while (1) {
+        // Just to have a matrix of the original video
+        Mat src;
+        cap.read(src);
 
         //Read a frame
         cap.read(org);
+
+
         if (org.empty()) //When this happens we've reached the end
             break;
 
+        //--------------Bird's eye view-----------------
         //Generate bird's eye view
         warpPerspective(org, dst, perspectiveMatrix, dst.size(), INTER_LINEAR, BORDER_CONSTANT);
+
         //--------------GRAYSCALE IMAGE-----------------
         // Define grayscale image
         //Convert to gray
         cvtColor(dst, img, COLOR_RGB2GRAY);
 
-        // --------------Yellow & White Lines-----------------
+        // --------------Detect Yellow & White Lines-----------------
         //Extract yellow and white info
         Mat maskYellow, maskWhite;
 
@@ -157,10 +164,10 @@ int main(int argc, char **argv) {
         for (int i = 0; i < outPts.size() - 1; ++i)
         {
             line(org, outPts[i], outPts[i + 1], Scalar(255, 0, 0), 3);
-            allPts.push_back(Point(outPts[i].x, outPts[i].y));
+            allPts.emplace_back(outPts[i].x, outPts[i].y);
         }
 
-        allPts.push_back(Point(outPts[outPts.size() - 1].x, outPts[outPts.size() - 1].y));
+        allPts.emplace_back(outPts[outPts.size() - 1].x, outPts[outPts.size() - 1].y);
 
         Mat out;
         cvtColor(processed, out, COLOR_GRAY2BGR); //Conver the processing image to color so that we can visualise the lines
@@ -176,10 +183,10 @@ int main(int argc, char **argv) {
         for (int i = 0; i < outPts.size() - 1; ++i)
         {
             line(org, outPts[i], outPts[i + 1], Scalar(0, 0, 255), 3);
-            allPts.push_back(Point(outPts[outPts.size() - i - 1].x, outPts[outPts.size() - i - 1].y));
+            allPts.emplace_back(outPts[outPts.size() - i - 1].x, outPts[outPts.size() - i - 1].y);
         }
 
-        allPts.push_back(Point(outPts[0].x - (outPts.size() - 1) , outPts[0].y));
+        allPts.emplace_back(outPts[0].x - (outPts.size() - 1) , outPts[0].y);
 
         for (int i = 0; i < pts.size() - 1; ++i)
             line(out, pts[i], pts[i + 1], Scalar(0, 0, 255));
@@ -190,18 +197,19 @@ int main(int argc, char **argv) {
         Mat overlay = Mat::zeros(org.size(), org.type());
         fillPoly(overlay, arr, Scalar(0, 255, 100));
         addWeighted(org, 1, overlay, 0.5, 0, org); //Overlay it
+
+        // Add frame counter to the org
         frameCounter++;
-
         std::time_t timeNow = std::time(0) - timeBegin;
-
         if (timeNow - tick >= 1)
         {
             tick++;
             fps = frameCounter;
             frameCounter = 0;
         }
+        cv::putText(org, cv::format("Average FPS=%d", fps ), cv::Point(40, 40),
+                    cv::FONT_HERSHEY_COMPLEX, 0.8, cv::Scalar(0,0,255));
 
-        cv::putText(org, cv::format("Average FPS=%d", fps ), cv::Point(1000, 40), cv::FONT_HERSHEY_COMPLEX, 0.8, cv::Scalar(0,0,255));
         //Show results
         imshow("Preprocess", out);
         imshow("src", org);
