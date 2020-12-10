@@ -19,6 +19,8 @@ opencv2/highgui.hpp
 -
 opencv2/calib3d.hpp
 -
+opencv2/objdetect.hpp
+-
 
 /usr/local/include/opencv4/opencv2/calib3d.hpp
 opencv2/core.hpp

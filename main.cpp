@@ -4,10 +4,11 @@
 #include <opencv2/videoio.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/calib3d.hpp>
+#include <opencv2/objdetect.hpp>
+
 
 using namespace cv;
 using namespace std;
-
 
 vector<Point2f> slidingWindow(Mat image, Rect window)
 {
@@ -63,6 +64,12 @@ vector<Point2f> slidingWindow(Mat image, Rect window)
 }
 
 int main(int argc, char **argv) {
+    const String cascade_name("/Users/pojashad/Desktop/dev/opencvtest/cascade2.xml");
+    CascadeClassifier cascade;
+    if (!cascade.load(cascade_name)) {
+        cout << "Error loading face cascade\n";
+        return -1;
+    }
     //---------------GET IMAGE---------------------
     // Read the image file
     // TODO: Change to an argument, enter path to image
@@ -197,6 +204,17 @@ int main(int argc, char **argv) {
         Mat overlay = Mat::zeros(org.size(), org.type());
         fillPoly(overlay, arr, Scalar(0, 255, 100));
         addWeighted(org, 1, overlay, 0.5, 0, org); //Overlay it
+
+        //-------------- Object detection -----------------
+        Mat frame_gray;
+        cvtColor(org, frame_gray, COLOR_BGR2GRAY);
+        vector<Rect> faces;
+        cascade.detectMultiScale(frame_gray,faces);
+        for (auto& face : faces) {
+            rectangle(org, face, Scalar(255, 255, 0), 2);
+            cv::putText(org, cv::format("Car"), cv::Point(face.x, face.y-10),
+                        cv::FONT_HERSHEY_COMPLEX, 0.8, cv::Scalar(0,0,255));
+        }
 
         // Add frame counter to the org
         frameCounter++;
